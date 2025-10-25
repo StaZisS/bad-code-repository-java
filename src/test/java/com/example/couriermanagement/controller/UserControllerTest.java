@@ -1,0 +1,194 @@
+package com.example.couriermanagement.controller;
+
+import com.example.couriermanagement.BaseIntegrationTest;
+import com.example.couriermanagement.dto.request.UserRequest;
+import com.example.couriermanagement.dto.request.UserUpdateRequest;
+import com.example.couriermanagement.entity.UserRole;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.web.servlet.MvcResult;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+public class UserControllerTest extends BaseIntegrationTest {
+
+    @Test
+    public void getAllUsersAsAdminShouldSucceed() throws Exception {
+        expectSuccess(getWithAuth("/users", adminToken))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(3)); // admin, manager, courier
+    }
+
+    @Test
+    public void getAllUsersAsManagerShouldReturn403() throws Exception {
+        expectForbidden(getWithAuth("/users", managerToken));
+    }
+
+    @Test
+    public void getAllUsersAsCourierShouldReturn403() throws Exception {
+        expectForbidden(getWithAuth("/users", courierToken));
+    }
+
+    @Test
+    public void getAllUsersWithoutAuthShouldReturn403() throws Exception {
+        expectForbidden(mockMvc.perform(get("/users")));
+    }
+
+    @Test
+    public void getUsersFilteredByRoleShouldReturnFilteredResults() throws Exception {
+        expectSuccess(getWithAuth("/users?role=courier", adminToken))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].role").value("courier"));
+    }
+
+    @Test
+    public void createUserAsAdminShouldSucceed() throws Exception {
+        UserRequest userRequest = UserRequest.builder()
+            .login("newcourier")
+            .password("password123")
+            .name("Новый Курьер")
+            .role(UserRole.courier)
+            .build();
+
+        expectSuccess(postJson("/users", userRequest, adminToken))
+            .andExpect(jsonPath("$.login").value("newcourier"))
+            .andExpect(jsonPath("$.name").value("Новый Курьер"))
+            .andExpect(jsonPath("$.role").value("courier"))
+            .andExpect(jsonPath("$.id").exists());
+    }
+
+    @Test
+    public void createUserAsManagerShouldReturn403() throws Exception {
+        UserRequest userRequest = UserRequest.builder()
+            .login("newcourier")
+            .password("password123")
+            .name("Новый Курьер")
+            .role(UserRole.courier)
+            .build();
+
+        expectForbidden(postJson("/users", userRequest, managerToken));
+    }
+
+    @Test
+    public void createUserWithDuplicateLoginShouldReturn400() throws Exception {
+        UserRequest userRequest = UserRequest.builder()
+            .login("admin") // Already exists
+            .password("password123")
+            .name("Другой Админ")
+            .role(UserRole.admin)
+            .build();
+
+        expectBadRequest(postJson("/users", userRequest, adminToken));
+    }
+
+    @Test
+    public void createUserWithInvalidDataShouldReturn400() throws Exception {
+        UserRequest userRequest = UserRequest.builder()
+            .login("") // Empty login
+            .password("") // Empty password
+            .name("") // Empty name
+            .role(UserRole.courier)
+            .build();
+
+        expectBadRequest(postJson("/users", userRequest, adminToken));
+    }
+
+    @Test
+    public void createManagerUserShouldSucceed() throws Exception {
+        UserRequest userRequest = UserRequest.builder()
+            .login("newmanager")
+            .password("password123")
+            .name("Новый Менеджер")
+            .role(UserRole.manager)
+            .build();
+
+        expectSuccess(postJson("/users", userRequest, adminToken))
+            .andExpect(jsonPath("$.role").value("manager"));
+    }
+
+    @Test
+    public void updateUserAsAdminShouldSucceed() throws Exception {
+        UserUpdateRequest updateRequest = UserUpdateRequest.builder()
+            .name("Обновленное Имя")
+            .login("updatedcourier")
+            .role(UserRole.manager)
+            .password("newpassword")
+            .build();
+
+        expectSuccess(putJson("/users/" + courierUser.getId(), updateRequest, adminToken))
+            .andExpect(jsonPath("$.name").value("Обновленное Имя"))
+            .andExpect(jsonPath("$.login").value("updatedcourier"))
+            .andExpect(jsonPath("$.role").value("manager"));
+    }
+
+    @Test
+    public void updateUserAsManagerShouldReturn403() throws Exception {
+        UserUpdateRequest updateRequest = UserUpdateRequest.builder()
+            .name("Обновленное Имя")
+            .build();
+
+        expectForbidden(putJson("/users/" + courierUser.getId(), updateRequest, managerToken));
+    }
+
+    @Test
+    public void updateUserWithDuplicateLoginShouldReturn400() throws Exception {
+        UserUpdateRequest updateRequest = UserUpdateRequest.builder()
+            .login("admin") // Already exists
+            .build();
+
+        expectBadRequest(putJson("/users/" + courierUser.getId(), updateRequest, adminToken));
+    }
+
+    @Test
+    public void updateNonExistentUserShouldReturn404() throws Exception {
+        UserUpdateRequest updateRequest = UserUpdateRequest.builder()
+            .name("Обновленное Имя")
+            .build();
+
+        expectBadRequest(putJson("/users/999", updateRequest, adminToken)); // Service throws IllegalArgumentException, which becomes 400
+    }
+
+    @Test
+    public void updateUserPartialDataShouldSucceed() throws Exception {
+        UserUpdateRequest updateRequest = UserUpdateRequest.builder()
+            .name("Только Новое Имя")
+            .build();
+
+        expectSuccess(putJson("/users/" + courierUser.getId(), updateRequest, adminToken))
+            .andExpect(jsonPath("$.name").value("Только Новое Имя"))
+            .andExpect(jsonPath("$.login").value(courierUser.getLogin())) // Unchanged
+            .andExpect(jsonPath("$.role").value(courierUser.getRole().name())); // Unchanged
+    }
+
+    @Test
+    public void deleteUserAsAdminShouldSucceed() throws Exception {
+        // Create a user to delete
+        UserRequest userRequest = UserRequest.builder()
+            .login("todelete")
+            .password("password123")
+            .name("Для Удаления")
+            .role(UserRole.courier)
+            .build();
+        
+        MvcResult createResponse = expectSuccess(postJson("/users", userRequest, adminToken))
+            .andReturn();
+        
+        JsonNode responseJson = objectMapper.readTree(createResponse.getResponse().getContentAsString());
+        Long createdUserId = responseJson.get("id").asLong();
+
+        deleteWithAuth("/users/" + createdUserId, adminToken)
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void deleteUserAsManagerShouldReturn403() throws Exception {
+        expectForbidden(deleteWithAuth("/users/" + courierUser.getId(), managerToken));
+    }
+
+    @Test
+    public void deleteNonExistentUserShouldReturn404() throws Exception {
+        expectBadRequest(deleteWithAuth("/users/999", adminToken)); // Service throws IllegalArgumentException, which becomes 400
+    }
+}
