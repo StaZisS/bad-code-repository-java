@@ -104,7 +104,7 @@ public abstract class BaseIntegrationTest {
                 .login("manager")
                 .passwordHash(passwordEncoder.encode("password"))
                 .name("Менеджер")
-                .role(UserRole.manager)
+                .role(UserRole.MANAGER)
                 .createdAt(LocalDateTime.now())
                 .build()
         );
@@ -114,7 +114,7 @@ public abstract class BaseIntegrationTest {
                 .login("courier")
                 .passwordHash(passwordEncoder.encode("password"))
                 .name("Курьер")
-                .role(UserRole.courier)
+                .role(UserRole.COURIER)
                 .createdAt(LocalDateTime.now())
                 .build()
         );
@@ -223,7 +223,7 @@ public abstract class BaseIntegrationTest {
         return delivery;
     }
 
-    protected ResultActions expectSuccess(ResultActions resultActions) {
+    protected ResultActions expectSuccess(ResultActions resultActions) throws Exception {
         return resultActions.andExpect(result -> {
             int status = result.getResponse().getStatus();
             if (status < 200 || status >= 300) {
@@ -236,7 +236,7 @@ public abstract class BaseIntegrationTest {
         });
     }
 
-    protected ResultActions expectBadRequest(ResultActions resultActions) {
+    protected ResultActions expectBadRequest(ResultActions resultActions) throws Exception {
         return resultActions.andExpect(result -> {
             int status = result.getResponse().getStatus();
             if (status != 400) {
@@ -249,7 +249,7 @@ public abstract class BaseIntegrationTest {
         });
     }
 
-    protected ResultActions expectUnauthorized(ResultActions resultActions) {
+    protected ResultActions expectUnauthorized(ResultActions resultActions) throws Exception {
         return resultActions.andExpect(result -> {
             int status = result.getResponse().getStatus();
             if (status != 401) {
@@ -262,7 +262,7 @@ public abstract class BaseIntegrationTest {
         });
     }
 
-    protected ResultActions expectForbidden(ResultActions resultActions) {
+    protected ResultActions expectForbidden(ResultActions resultActions) throws Exception {
         return resultActions.andExpect(result -> {
             int status = result.getResponse().getStatus();
             if (status != 403) {
@@ -275,7 +275,7 @@ public abstract class BaseIntegrationTest {
         });
     }
 
-    protected ResultActions expectNotFound(ResultActions resultActions) {
+    protected ResultActions expectNotFound(ResultActions resultActions) throws Exception {
         return resultActions.andExpect(result -> {
             int status = result.getResponse().getStatus();
             if (status != 404) {

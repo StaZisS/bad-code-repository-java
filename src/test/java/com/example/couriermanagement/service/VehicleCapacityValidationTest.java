@@ -1,6 +1,7 @@
 package com.example.couriermanagement.service;
 
 import com.example.couriermanagement.BaseIntegrationTest;
+import com.example.couriermanagement.dto.DeliveryDto;
 import com.example.couriermanagement.dto.request.*;
 import com.example.couriermanagement.entity.Delivery;
 import com.example.couriermanagement.entity.DeliveryStatus;
@@ -93,7 +94,7 @@ public class VehicleCapacityValidationTest extends BaseIntegrationTest {
                 managerUser.getLogin(), null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(auth);
             
-            Delivery result = deliveryService.createDelivery(deliveryRequest);
+            DeliveryDto result = deliveryService.createDelivery(deliveryRequest);
             System.out.println("✅ Delivery created successfully with sufficient capacity: " + result.getId());
         } catch (Exception e) {
             throw new AssertionError("Expected delivery creation to succeed with sufficient capacity, but got: " + e.getMessage());
@@ -222,7 +223,7 @@ public class VehicleCapacityValidationTest extends BaseIntegrationTest {
                 managerUser.getLogin(), null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(auth);
             
-            Delivery firstDelivery = deliveryService.createDelivery(firstDeliveryRequest);
+            DeliveryDto firstDelivery = deliveryService.createDelivery(firstDeliveryRequest);
             System.out.println("✅ First delivery created: " + firstDelivery.getId() + " with 600кг");
         } catch (Exception e) {
             throw new AssertionError("First delivery should have succeeded: " + e.getMessage());
@@ -313,7 +314,7 @@ public class VehicleCapacityValidationTest extends BaseIntegrationTest {
                 managerUser.getLogin(), null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(auth);
             
-            Delivery firstDelivery = deliveryService.createDelivery(firstDeliveryRequest);
+            DeliveryDto firstDelivery = deliveryService.createDelivery(firstDeliveryRequest);
             System.out.println("✅ First delivery created: " + firstDelivery.getId() + " from 9:00-12:00 with 600кг");
         } catch (Exception e) {
             throw new AssertionError("First delivery should have succeeded: " + e.getMessage());
@@ -348,7 +349,7 @@ public class VehicleCapacityValidationTest extends BaseIntegrationTest {
                 managerUser.getLogin(), null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(auth);
             
-            Delivery secondDelivery = deliveryService.createDelivery(secondDeliveryRequest);
+            DeliveryDto secondDelivery = deliveryService.createDelivery(secondDeliveryRequest);
             System.out.println("✅ Second delivery created successfully: " + secondDelivery.getId() + " from 13:00-16:00 with 600кг (no time overlap)");
         } catch (Exception e) {
             throw new AssertionError("Second delivery should have succeeded with non-overlapping time, but got: " + e.getMessage());
@@ -391,7 +392,7 @@ public class VehicleCapacityValidationTest extends BaseIntegrationTest {
                 managerUser.getLogin(), null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(auth);
             
-            Delivery firstDelivery = deliveryService.createDelivery(firstDeliveryRequest);
+            DeliveryDto firstDelivery = deliveryService.createDelivery(firstDeliveryRequest);
             System.out.println("✅ First delivery created: " + firstDelivery.getId() + " from 9:00-13:00 with 600кг");
         } catch (Exception e) {
             throw new AssertionError("First delivery should have succeeded: " + e.getMessage());
@@ -483,7 +484,7 @@ public class VehicleCapacityValidationTest extends BaseIntegrationTest {
                 managerUser.getLogin(), null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(auth);
             
-            Delivery firstDelivery = deliveryService.createDelivery(firstDeliveryRequest);
+            DeliveryDto firstDelivery = deliveryService.createDelivery(firstDeliveryRequest);
             firstDeliveryId = firstDelivery.getId();
             System.out.println("✅ First delivery created: " + firstDelivery.getId() + " from 9:00-13:00 with 600кг");
         } catch (Exception e) {
@@ -537,7 +538,7 @@ public class VehicleCapacityValidationTest extends BaseIntegrationTest {
                 managerUser.getLogin(), null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(auth);
             
-            Delivery secondDelivery = deliveryService.createDelivery(secondDeliveryRequest);
+            DeliveryDto secondDelivery = deliveryService.createDelivery(secondDeliveryRequest);
             System.out.println("✅ Second delivery created successfully: " + secondDelivery.getId() + " - completed deliveries ignored");
         } catch (Exception e) {
             throw new AssertionError("Second delivery should have succeeded since completed deliveries don't count, but got: " + e.getMessage());

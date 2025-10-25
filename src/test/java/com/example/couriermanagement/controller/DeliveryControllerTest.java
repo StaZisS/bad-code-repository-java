@@ -61,9 +61,9 @@ public class DeliveryControllerTest extends BaseIntegrationTest {
     public void getDeliveriesWithStatusFilterShouldReturnFilteredResults() throws Exception {
         createDelivery();
 
-        expectSuccess(getWithAuth("/deliveries?status=planned", managerToken))
+        expectSuccess(getWithAuth("/deliveries?status=PLANNED", managerToken))
             .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].status").value("planned"));
+            .andExpect(jsonPath("$[0].status").value("PLANNED"));
     }
 
     @Test

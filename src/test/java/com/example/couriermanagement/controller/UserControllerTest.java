@@ -37,10 +37,10 @@ public class UserControllerTest extends BaseIntegrationTest {
 
     @Test
     public void getUsersFilteredByRoleShouldReturnFilteredResults() throws Exception {
-        expectSuccess(getWithAuth("/users?role=courier", adminToken))
+        expectSuccess(getWithAuth("/users?role=COURIER", adminToken))
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].role").value("courier"));
+            .andExpect(jsonPath("$[0].role").value("COURIER"));
     }
 
     @Test
@@ -49,13 +49,13 @@ public class UserControllerTest extends BaseIntegrationTest {
             .login("newcourier")
             .password("password123")
             .name("Новый Курьер")
-            .role(UserRole.courier)
+            .role(UserRole.COURIER)
             .build();
 
         expectSuccess(postJson("/users", userRequest, adminToken))
             .andExpect(jsonPath("$.login").value("newcourier"))
             .andExpect(jsonPath("$.name").value("Новый Курьер"))
-            .andExpect(jsonPath("$.role").value("courier"))
+            .andExpect(jsonPath("$.role").value("COURIER"))
             .andExpect(jsonPath("$.id").exists());
     }
 
@@ -65,7 +65,7 @@ public class UserControllerTest extends BaseIntegrationTest {
             .login("newcourier")
             .password("password123")
             .name("Новый Курьер")
-            .role(UserRole.courier)
+            .role(UserRole.COURIER)
             .build();
 
         expectForbidden(postJson("/users", userRequest, managerToken));
@@ -77,7 +77,7 @@ public class UserControllerTest extends BaseIntegrationTest {
             .login("admin") // Already exists
             .password("password123")
             .name("Другой Админ")
-            .role(UserRole.admin)
+            .role(UserRole.ADMIN)
             .build();
 
         expectBadRequest(postJson("/users", userRequest, adminToken));
@@ -89,7 +89,7 @@ public class UserControllerTest extends BaseIntegrationTest {
             .login("") // Empty login
             .password("") // Empty password
             .name("") // Empty name
-            .role(UserRole.courier)
+            .role(UserRole.COURIER)
             .build();
 
         expectBadRequest(postJson("/users", userRequest, adminToken));
@@ -101,11 +101,11 @@ public class UserControllerTest extends BaseIntegrationTest {
             .login("newmanager")
             .password("password123")
             .name("Новый Менеджер")
-            .role(UserRole.manager)
+            .role(UserRole.MANAGER)
             .build();
 
         expectSuccess(postJson("/users", userRequest, adminToken))
-            .andExpect(jsonPath("$.role").value("manager"));
+            .andExpect(jsonPath("$.role").value("MANAGER"));
     }
 
     @Test
@@ -113,14 +113,14 @@ public class UserControllerTest extends BaseIntegrationTest {
         UserUpdateRequest updateRequest = UserUpdateRequest.builder()
             .name("Обновленное Имя")
             .login("updatedcourier")
-            .role(UserRole.manager)
+            .role(UserRole.MANAGER)
             .password("newpassword")
             .build();
 
         expectSuccess(putJson("/users/" + courierUser.getId(), updateRequest, adminToken))
             .andExpect(jsonPath("$.name").value("Обновленное Имя"))
             .andExpect(jsonPath("$.login").value("updatedcourier"))
-            .andExpect(jsonPath("$.role").value("manager"));
+            .andExpect(jsonPath("$.role").value("MANAGER"));
     }
 
     @Test
@@ -169,7 +169,7 @@ public class UserControllerTest extends BaseIntegrationTest {
             .login("todelete")
             .password("password123")
             .name("Для Удаления")
-            .role(UserRole.courier)
+            .role(UserRole.COURIER)
             .build();
         
         MvcResult createResponse = expectSuccess(postJson("/users", userRequest, adminToken))

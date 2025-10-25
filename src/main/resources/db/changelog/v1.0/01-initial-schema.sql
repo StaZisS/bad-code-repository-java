@@ -8,7 +8,7 @@ CREATE TABLE users (
     name VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT ck_users_role CHECK (role IN ('admin', 'manager', 'courier'))
+    CONSTRAINT ck_users_role CHECK (role IN ('ADMIN', 'MANAGER', 'COURIER'))
 );
 
 --changeset staziss:002-create-vehicles-table
@@ -43,13 +43,13 @@ CREATE TABLE deliveries (
     delivery_date DATE NOT NULL,
     time_start TIME NOT NULL,
     time_end TIME NOT NULL,
-    status VARCHAR(20) DEFAULT 'planned' NOT NULL,
+    status VARCHAR(20) DEFAULT 'PLANNED' NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT fk_deliveries_courier FOREIGN KEY (courier_id) REFERENCES users(id),
     CONSTRAINT fk_deliveries_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(id),
     CONSTRAINT fk_deliveries_created_by FOREIGN KEY (created_by) REFERENCES users(id),
-    CONSTRAINT ck_deliveries_status CHECK (status IN ('planned', 'in_progress', 'completed', 'cancelled')),
+    CONSTRAINT ck_deliveries_status CHECK (status IN ('PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')),
     CONSTRAINT ck_deliveries_time_order CHECK (time_end > time_start)
 );
 
@@ -88,4 +88,4 @@ CREATE INDEX idx_users_role ON users(role);
 
 --changeset staziss:008-insert-default-admin
 INSERT INTO users (login, password_hash, name, role) VALUES 
-('admin', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewRZCnvDHb4LqQ8.', 'Системный администратор', 'admin');
+('admin', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewRZCnvDHb4LqQ8.', 'Системный администратор', 'ADMIN');

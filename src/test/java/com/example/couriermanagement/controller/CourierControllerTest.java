@@ -70,9 +70,9 @@ public class CourierControllerTest extends BaseIntegrationTest {
     public void getCourierDeliveriesWithStatusFilterShouldReturnFilteredResults() throws Exception {
         createDelivery(courierUser, createVehicle());
 
-        expectSuccess(getWithAuth("/courier/deliveries?status=planned", courierToken))
+        expectSuccess(getWithAuth("/courier/deliveries?status=PLANNED", courierToken))
             .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].status").value("planned"));
+            .andExpect(jsonPath("$[0].status").value("PLANNED"));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class CourierControllerTest extends BaseIntegrationTest {
                 .login("othercourier")
                 .passwordHash(passwordEncoder.encode("password"))
                 .name("Другой Курьер")
-                .role(UserRole.courier)
+                .role(UserRole.COURIER)
                 .createdAt(LocalDateTime.now())
                 .build()
         );
@@ -126,7 +126,7 @@ public class CourierControllerTest extends BaseIntegrationTest {
                 .login("othercourier2")
                 .passwordHash(passwordEncoder.encode("password"))
                 .name("Другой Курьер 2")
-                .role(UserRole.courier)
+                .role(UserRole.COURIER)
                 .createdAt(LocalDateTime.now())
                 .build()
         );

@@ -1,6 +1,7 @@
 package com.example.couriermanagement.service;
 
 import com.example.couriermanagement.BaseIntegrationTest;
+import com.example.couriermanagement.dto.DeliveryDto;
 import com.example.couriermanagement.dto.request.*;
 import com.example.couriermanagement.entity.Delivery;
 import com.example.couriermanagement.entity.Product;
@@ -101,7 +102,7 @@ public class RouteTimeValidationTest extends BaseIntegrationTest {
                 managerUser.getLogin(), null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(auth);
             
-            Delivery result = deliveryService.createDelivery(deliveryRequest);
+            DeliveryDto result = deliveryService.createDelivery(deliveryRequest);
             System.out.println("✅ Short route delivery created successfully: " + result.getId());
         } catch (Exception e) {
             throw new AssertionError("Expected delivery creation to succeed for short route, but got: " + e.getMessage());

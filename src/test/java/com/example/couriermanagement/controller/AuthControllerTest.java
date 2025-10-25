@@ -20,7 +20,7 @@ public class AuthControllerTest extends BaseIntegrationTest {
             .andExpect(jsonPath("$.user.id").value(adminUser.getId()))
             .andExpect(jsonPath("$.user.login").value("admin"))
             .andExpect(jsonPath("$.user.name").value("Системный администратор"))
-            .andExpect(jsonPath("$.user.role").value("admin"));
+            .andExpect(jsonPath("$.user.role").value("ADMIN"));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class AuthControllerTest extends BaseIntegrationTest {
 
         expectSuccess(postJson("/auth/login", loginRequest))
             .andExpect(jsonPath("$.token").exists())
-            .andExpect(jsonPath("$.user.role").value("manager"));
+            .andExpect(jsonPath("$.user.role").value("MANAGER"));
     }
 
     @Test
@@ -84,6 +84,6 @@ public class AuthControllerTest extends BaseIntegrationTest {
 
         expectSuccess(postJson("/auth/login", loginRequest))
             .andExpect(jsonPath("$.token").exists())
-            .andExpect(jsonPath("$.user.role").value("courier"));
+            .andExpect(jsonPath("$.user.role").value("COURIER"));
     }
 }
